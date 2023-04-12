@@ -15,6 +15,8 @@ class Game {
     Player *player2;
     std::vector<Card> p1_hand;
     std::vector<Card> p2_hand;
+    std::vector<Card> p1_winnings;
+    std::vector<Card> p2_winnings;
 
     //for stats
     int sub_turn_counter;
@@ -27,11 +29,11 @@ class Game {
 
 public:
     Game(Player &player1, Player &player2);     
-    void devide_cards();   
     void playTurn();   
-    void playAll();   
     void printLastTurn();   
+    void playAll();   
     void printWiner();   
     void printLog();   
     void printStats();
+    void devide_cards();   
 };

@@ -37,5 +37,4 @@ public:
     Card(CardType type, CardNumber number);
     CardType getType() { return m_type; }
     CardNumber getNumber() { return m_number; }
-    string toString();
 };

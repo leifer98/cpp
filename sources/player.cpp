@@ -1,16 +1,21 @@
 #include "player.hpp"
 
 Player::Player() {
-
-} 
+    name = "";
+    stack_size = 0;
+    cards_taken = 0;
+}
 
 Player::Player(string str) {
+    name = str;
+    stack_size = 0;
+    cards_taken = 0;
+}
 
-} 
-    
 int Player::stacksize() {
-    return 0;
-}  
+    return stack_size;
+}
+
 int Player::cardesTaken() {
-    return 0;
-}  
+    return cards_taken;
+}
