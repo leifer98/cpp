@@ -1,4 +1,5 @@
 #include "Fraction.hpp"
+#include <limits.h>
 
 Fraction::Fraction(int num, int denum)
 {
@@ -25,40 +26,66 @@ Fraction::Fraction()
 
 Fraction Fraction::operator+(const Fraction &other)
 {
-    // calculate the common denominator
-    int commonDenom = denum * other.denum;
-    // calculate the new numerator
-    int newNum = num * other.denum + other.num * denum;
+    Fraction c = Fraction(this->num, this->denum).reduce();
+    Fraction o = Fraction(other.num, other.denum).reduce();
+    // multiply the numerators and denominators separately
+    long long commonDenum = static_cast<long long>(c.denum) * static_cast<long long>(o.denum);
+    long long newNum1 = static_cast<long long>(c.num) * static_cast<long long>(o.denum);
+    long long newNum2 = static_cast<long long>(c.denum) * static_cast<long long>(o.num);
+    long long newNum3 = newNum1 + newNum2;
 
-    // return the sum of two fractions in reduced form
-    return Fraction(newNum, commonDenom).reduce();
+    // check for overflow
+    if (commonDenum > std::numeric_limits<int>::max() || commonDenum < std::numeric_limits<int>::min() ||
+        newNum3 > std::numeric_limits<int>::max() || newNum3 < std::numeric_limits<int>::min())
+    {
+        throw std::overflow_error("Fraction multiplication overflow");
+    }
+    return Fraction(static_cast<int>(newNum3), static_cast<int>(commonDenum)).reduce();
 }
 
 Fraction Fraction::operator-(const Fraction &other)
 {
-    // find a common denominator
-    int commonDenum = this->denum * other.denum;
-    // calculate the new numerators based on the common denominator
-    int newNum1 = this->num * other.denum;
-    int newNum2 = other.num * this->denum;
-    // subtract the numerators and return the result as a new fraction
-    return Fraction(newNum1 - newNum2, commonDenum).reduce();
+    Fraction c = Fraction(this->num, this->denum).reduce();
+    Fraction o = Fraction(other.num, other.denum).reduce();
+    // multiply the numerators and denominators separately
+    long long commonDenum = static_cast<long long>(c.denum) * static_cast<long long>(o.denum);
+    long long newNum1 = static_cast<long long>(c.num) * static_cast<long long>(o.denum);
+    long long newNum2 = static_cast<long long>(c.denum) * static_cast<long long>(o.num);
+    long long newNum3 = newNum1 - newNum2;
+
+    // check for overflow
+    if (commonDenum > std::numeric_limits<int>::max() || commonDenum < std::numeric_limits<int>::min() ||
+        newNum3 > std::numeric_limits<int>::max() || newNum3 < std::numeric_limits<int>::min())
+    {
+        throw std::overflow_error("Fraction multiplication overflow");
+    }
+    return Fraction(static_cast<int>(newNum3), static_cast<int>(commonDenum)).reduce();
 }
 
 Fraction Fraction::operator*(const Fraction &other)
 {
+    Fraction c = Fraction(this->num, this->denum).reduce();
+    Fraction o = Fraction(other.num, other.denum).reduce();
     // multiply the numerators and denominators separately
-    int newNum = this->num * other.num;
-    int newDenum = this->denum * other.denum;
+    long long newNum = static_cast<long long>(c.num) * static_cast<long long>(o.num);
+    long long newDenum = static_cast<long long>(c.denum) * static_cast<long long>(o.denum);
+
+    // check for overflow
+    if (newNum > std::numeric_limits<int>::max() || newNum < std::numeric_limits<int>::min() ||
+        newDenum > std::numeric_limits<int>::max() || newDenum < std::numeric_limits<int>::min())
+    {
+        throw std::overflow_error("Fraction multiplication overflow");
+    }
+
     // return the result as a new fraction
-    return Fraction(newNum, newDenum).reduce();
+    return Fraction(static_cast<int>(newNum), static_cast<int>(newDenum)).reduce();
 }
 
 Fraction Fraction::operator/(const Fraction &other)
 {
     if (other.num == 0)
     {
-        throw std::invalid_argument("Denominator cannot be zero.");
+        throw std::runtime_error("Denominator cannot be zero.");
     }
 
     Fraction invFraction(other.denum, other.num);
@@ -67,50 +94,36 @@ Fraction Fraction::operator/(const Fraction &other)
 
 Fraction &Fraction::operator++()
 {
-    // decrement the numerator by the denominator
-    this->num += this->denum;
-    // simplify the fraction
-    Fraction f = this->reduce();
-    this->denum = f.denum;
-    this->num = f.num;
+    // increment the fraction by 1/1
+    *this = *this + Fraction(1, 1);
     // return a reference to this fraction
     return *this;
 }
 
 Fraction Fraction::operator++(int)
 {
+    // save the current value of the fraction
     Fraction c = Fraction(this->num, this->denum);
-    // decrement the numerator by the denominator
-    this->num += this->denum;
-    // simplify the fraction
-    Fraction f = this->reduce();
-    this->denum = f.denum;
-    this->num = f.num;
+    // increment the fraction by 1/1
+    *this = *this + Fraction(1, 1);
     // return the previous value of this fraction
     return c;
 }
 
 Fraction &Fraction::operator--()
 {
-    // decrement the numerator by the denominator
-    this->num -= this->denum;
-    // simplify the fraction
-    Fraction f = this->reduce();
-    this->denum = f.denum;
-    this->num = f.num;
+    // decrement the fraction by 1/1
+    *this = *this - Fraction(1, 1);
     // return a reference to this fraction
     return *this;
 }
 
 Fraction Fraction::operator--(int)
 {
+    // save the current value of the fraction
     Fraction c = Fraction(this->num, this->denum);
-    // decrement the numerator by the denominator
-    this->num -= this->denum;
-    // simplify the fraction
-    Fraction f = this->reduce();
-    this->denum = f.denum;
-    this->num = f.num;
+    // decrement the fraction by 1/1
+    *this = *this - Fraction(1, 1);
     // return the previous value of this fraction
     return c;
 }
@@ -132,8 +145,10 @@ bool Fraction::operator!=(const Fraction &other) const
 bool Fraction::operator<(const Fraction &other) const
 {
     // calculate the new numerators based on the common denominator
-    int newNum1 = this->num * other.denum;
-    int newNum2 = other.num * this->denum;
+    Fraction f1 = other + 0;
+    Fraction f2 = *this + 0;
+    int newNum1 = f2.num * f1.denum;
+    int newNum2 = f1.num * f2.denum;
     // compare the numerators
     return newNum1 < newNum2;
 }
@@ -315,49 +330,66 @@ Fraction operator/(const Fraction &fraction, float scalar)
 std::ostream &operator<<(std::ostream &oss, const Fraction &fraction)
 {
     // print the fraction to the output stream
-    oss << fraction.num << "/" << fraction.denum;
+    Fraction f2 = fraction + 0;
+    oss << f2.num << "/" << f2.denum;
     return oss;
 }
 
 std::istream &operator>>(std::istream &iss, Fraction &fraction)
 {
-    // read a fraction from the input stream
-    int num, denum;
+    int num, denom;
     char slash;
-    iss >> num >> slash >> denum;
-    fraction = Fraction(num, denum);
+    if (iss >> num >> denom)
+    {
+        if (denom == 0)
+        {
+            throw std::runtime_error("Invalid input: Denominator cannot be zero");
+        }
+        else
+        {
+            fraction = Fraction(num, denom);
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Invalid input: input must be in the format 'num denom'");
+    }
     return iss;
 }
 
 Fraction Fraction::reduce()
 {
     // reduce the fraction to its simplest form
-    int sign = 1;
-    if (num < 0)
+    int a = this->num;
+    int b = this->denum;
+    if (a < 0)
     {
-        sign *= -1;
-        num *= -1;
+        a = -a;
     }
-    if (denum < 0)
+    if (b < 0)
     {
-        sign *= -1;
-        denum *= -1;
+        b = -b;
     }
-    if (num == 0)
+
+    if (b < a)
     {
-        denum = 1;
-        return *this;
+        int temp = b;
+        b = a;
+        a = temp;
     }
-    int smaller = (num < denum) ? num : denum;
-    for (int i = smaller; i > 1; i--)
+    while (b != 0)
     {
-        if (num % i == 0 && denum % i == 0)
-        {
-            num /= i;
-            denum /= i;
-        }
+        int temp = b;
+        b = a % b;
+        a = temp;
     }
-    num *= sign;
+    this->num /= a;
+    this->denum /= a;
+    if (this->denum < 0)
+    {
+        this->denum = -1 * this->denum;
+        this->num = -1 * this->num;
+    }
     return *this;
 }
 

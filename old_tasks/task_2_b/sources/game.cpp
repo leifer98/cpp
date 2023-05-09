@@ -46,10 +46,10 @@ void Game::devide_cards()
 
 void Game::playTurn()
 {
-   ' if (player1->stacksize() == 0 || player2->stacksize() == 0)
+    if (player1->stacksize() == 0 || player2->stacksize() == 0)
     {
         throw std::runtime_error("Game finished!");
-    }'
+    }
     if (player1 == player2)
     {
         throw std::runtime_error("Players are the same!");
