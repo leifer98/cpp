@@ -9,27 +9,44 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <cassert>
 using namespace std;
 
-#include "sources/Fraction.hpp"
+#include "sources/Team.hpp" //no need for other includes
 
 using namespace ariel;
 
 
 int main() {
-    Fraction a(5,3), b(14,21);
-    cout << "a: " << a << "b: " << b << endl;
-    cout << "a+b" << a+b << endl; 
-    cout << "a-b" << a-b << endl; 
-    cout << "a/b" << a/b << endl; 
-    cout << "a*b" << a*b << endl; 
-    cout << "2.3*b" << 2.3*b << endl; 
-    cout << "a+2.421" << a+2.421 << endl; 
-    Fraction c = a+b-1;
-    cout << c++ << endl;
-    cout << --c << endl;
+    Point a(32.3,44),b(1.3,3.5);
+    assert(a.distance(b) == b.distance(a));
+    Cowboy *tom = new Cowboy("Tom", a);
+    OldNinja *sushi = new OldNinja("sushi", b);
+    tom->shoot(sushi);
+    cout << tom->print() <<endl;
 
-    cout << "c >=b ? : " << (c >= b) << endl;
-    if (a > 1.1) cout << " a is bigger than 1.1" << endl;
-    else cout << " a is smaller than 1.1" << endl;
+    sushi->move(tom);
+    sushi->slash(tom);
+
+    Team team_A(tom); 
+    team_A.add(new YoungNinja("Yogi", Point(64,57)));
+
+    // Team b(tom); should throw tom is already in team a
+
+     Team team_B(sushi);
+     team_B.add(new TrainedNinja("Hikari", Point(12,81)));
+
+
+     while(team_A.stillAlive() > 0 && team_B.stillAlive() > 0){
+        team_A.attack(&team_B);
+        team_B.attack(&team_A);
+        team_A.print();
+        team_B.print();
+     }
+
+     if (team_A.stillAlive() > 0) cout << "winner is team_A" << endl;
+     else cout << "winner is team_B" << endl;
+
+     return 0; // no memory issues. Team should free the memory of its members. both a and b teams are on the stack. 
+
 }
