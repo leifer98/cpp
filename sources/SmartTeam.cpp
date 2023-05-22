@@ -1,140 +1,45 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <cassert>
-#include <cmath>
+#include <limits>
+#include "SmartTeam.hpp"
 
-#include "Team.hpp"
 
-Team::Team(Character *captain) : captain(captain)
+SmartTeam::SmartTeam(Character *leader) : Team(leader)
 {
-    if (captain != nullptr)
-    {
-        if (captain->isTeamMate)
-        {
-            throw std::runtime_error("already a team mate");
-        }
-        fighters.push_back(captain);
-        captain->isTeamMate = true;
-    }
+    // Implementation placeholder
 }
 
-Team::Team(const Team &other)
-    : fighters(other.fighters.size()), captain(nullptr)
+int SmartTeam::calculateAttackerDamage(Character* enemyFighter)
 {
-    for (size_t i = 0; i < other.fighters.size(); ++i)
+    int ninjaDamage = 0;
+    int cowboyDamage = 0;
+
+    for (Character* fighter : this->fighters)
     {
-        Character *fighter = other.fighters[i];
-        if (fighter != nullptr)
+        if (fighter != nullptr && fighter->isAlive())
         {
-            Character *clone = fighter;
-            fighters[i] = clone;
-            if (fighter == other.captain)
+            if (Ninja* ninja = dynamic_cast<Ninja*>(fighter))
             {
-                captain = clone;
-            }
-        }
-    }
-}
-
-Team::Team(Team &&other) noexcept
-    : fighters(std::move(other.fighters)), captain(other.captain)
-{
-    other.captain = nullptr;
-}
-
-Team &Team::operator=(const Team &other)
-{
-    if (this != &other)
-    {
-        for (Character *fighter : fighters)
-        {
-            delete fighter;
-        }
-        fighters.clear();
-
-        captain = nullptr;
-
-        for (Character *fighter : other.fighters)
-        {
-            if (fighter != nullptr)
-            {
-                add(fighter);
-            }
-        }
-
-        if (other.captain != nullptr)
-        {
-            captain = other.captain;
-        }
-    }
-    return *this;
-}
-
-Team &Team::operator=(Team &&other) noexcept
-{
-    if (this != &other)
-    {
-        for (Character *fighter : fighters)
-        {
-            delete fighter;
-        }
-        fighters.clear();
-
-        fighters = std::move(other.fighters);
-        captain = other.captain;
-
-        other.captain = nullptr;
-    }
-    return *this;
-}
-
-Team::~Team()
-{
-    for (Character *fighter : fighters)
-    {
-        delete fighter;
-    }
-    fighters.clear();
-}
-
-void Team::add(Character *fighter)
-{
-    if (fighter != nullptr && fighters.size() < 10)
-    {
-        if (fighter->isTeamMate)
-        {
-            throw std::runtime_error("already a team mate");
-        }
-        // Determine the appropriate position to insert the fighter based on their type
-        auto insertPosition = fighters.end(); // Default position is at the end
-
-        if (dynamic_cast<Cowboy *>(fighter) != nullptr)
-        {
-            // Find the first ninja in the team and insert before it
-            for (auto it = fighters.begin(); it != fighters.end(); ++it)
-            {
-                if (dynamic_cast<Ninja *>(*it) != nullptr)
+                if (ninja->distance(enemyFighter) < 1.0)
                 {
-                    insertPosition = it;
-                    break;
+                    ninjaDamage += 40; // Increment Ninja damage by 40
+                }
+            }
+            else if (Cowboy* cowboy = dynamic_cast<Cowboy*>(fighter))
+            {
+                if (cowboy->hasboolets())
+                {
+                    cowboyDamage += 10; // Increment Cowboy damage by 10
                 }
             }
         }
+    }
 
-        // Insert the fighter at the determined position
-        fighters.insert(insertPosition, fighter);
-        fighter->isTeamMate = true;
-    }
-    else
-    {
-        throw std::runtime_error("Exceeded the maximum limit of 10 fighters");
-    }
+    return ninjaDamage + cowboyDamage + 1;
 }
 
-void Team::attack(Team *enemyTeam)
+
+void SmartTeam::attack(Team *enemyTeam)
 {
+
     if (enemyTeam == nullptr || this->stillAlive() == 0 || enemyTeam->stillAlive() == 0)
     {
         if (enemyTeam == nullptr)
@@ -188,15 +93,29 @@ void Team::attack(Team *enemyTeam)
 
     Character *enemy = nullptr;
     double minDistance = std::numeric_limits<double>::max();
+    int minEnemyAttacks = std::numeric_limits<int>::max(); // Track the minimum enemy attacks needed to kill an enemy
+    bool isTie = false;                                    // Flag to track if there is a tie on the minimum enemy attacks
     for (Character *enemyFighter : enemyTeam->fighters)
     {
         if (enemyFighter != nullptr && enemyFighter->isAlive())
         {
             double distance = (this->captain)->distance(enemyFighter);
-            if (distance < minDistance)
+            int enemyAttacks = enemyFighter->getHitPoints() / this->calculateAttackerDamage(enemyFighter);
+            if (enemyAttacks < minEnemyAttacks)
             {
                 minDistance = distance;
-                enemy = enemyFighter; // Corrected variable assignment
+                minEnemyAttacks = enemyAttacks;
+                enemy = enemyFighter;
+                isTie = false; // Reset the tie flag
+            }
+            else if (enemyAttacks == minEnemyAttacks)
+            {
+                if (!isTie || distance < minDistance)
+                {
+                    minDistance = distance;
+                    enemy = enemyFighter;
+                    isTie = true; // Set the tie flag
+                }
             }
         }
     }
@@ -272,35 +191,6 @@ void Team::attack(Team *enemyTeam)
                     enemyTeam->captain = enemyFighter;
                 }
             }
-        }
-    }
-}
-
-int Team::stillAlive() const
-{
-    int count = 0;
-    for (Character *fighter : fighters)
-    {
-        if (fighter != nullptr && fighter->isAlive())
-        {
-            count++;
-        }
-    }
-    return count;
-}
-
-void Team::print() const
-{
-    std::cout << "Team:" << std::endl;
-    if (captain != nullptr)
-    {
-        std::cout << "- captain: " << captain->print() << std::endl;
-    }
-    for (Character *fighter : fighters)
-    {
-        if (fighter != nullptr && fighter != captain)
-        {
-            std::cout << "- Fighter: " << fighter->print() << std::endl;
         }
     }
 }
