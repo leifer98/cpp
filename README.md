@@ -1,143 +1,62 @@
-# cowboy_vs_ninja_a
+# Title: The Quest for the Magical Iterators
 
-בתרגיל זה ניצור סימולציה של קרב בין נינגות ובוקרים
+Background Story: In the ancient kingdom of Iteratia, there exists a magical container that has the power to hold different types of mystical elements. These elements have various properties and abilities that are essential for maintaining the balance of the kingdom. Over time, the knowledge of harnessing the power of these elements was lost. It is said that three powerful iterators were created to unlock the potential of the magical container. These iterators represent different orders of traversal through the container, revealing different aspects of the mystical elements. The kingdom is now in turmoil, and the wise King seeks the help of a talented programmer to rediscover the power of these iterators.
+Objective: In this assignment, you will create a custom container class named "MagicalContainer" to store mystical elements represented by integers. You will also implement three custom iterator classes, each representing a different order of traversal through the container. By the end of this assignment, you should have a deeper understanding of custom iterators and their applications in C++.
 
-# חלק 1 Point
+Instructions:
+1.	Create a user-defined container class named "MagicalContainer" that can store integers representing mystical elements. Implement necessary methods for adding elements, removing elements, and retrieving the size of the container. You can use a dynamic array or any other suitable data structure for internal storage.
+2.	Create three custom iterator classes named "AscendingIterator", "SideCrossIterator", and "PrimeIterator" that will allow traversal of elements in the MagicalContainer class in ascending order, cross order, and prime numbers only, respectively. Each iterator should support the following operations:
 
-תחילה, נכתוב מחלקה שתעזור לנו לשמור מיקום על לוח המשחק. המיקום נתון כשתי קורדינאטות מסוג double ששומרות
-את מיקום היחידה לאורך הצירים x ו - y בהתאם.
-על ממשק המחלקה לתמוך בפעולות הבאות:
+operations:
 
-קונסטרקטור מקבל את שתי הקואורדינאטות –
+•	Default constructor
 
-מרחק distance
-מקבלת נקודה ומחשבת את המרחק בין שתי הנקודות –
+•	Copy constructor
 
-הדפסה print
-מדפיסה את שתי הקואורדינטות בין סוגריים. -
+•	Destructor
 
-לזוז ל moveTowards
-מקבלת נקודת מקור, נקודת יעד ומרחק. הפונקציה מחזירה את הנקודה הקרובה ביותר לנקודת היעד, –
-שנמצאת כל היותר במרחק הנתון מנקודת המקור
+•	Assignment operator
 
-# חלק 2 Character
+•	Equality comparison (operator==)
 
-מחלקה זו מציינת דמות. לדמות יש מיקום )מסוג Point (, נקודות פגיעה )מיוצג ע"י מספר שלם( ושם שמיוצג ע"י מחרוזת
-תווים.
-פונקציות המוגדרות על דמות:
+•	Inequality comparison (operator!=)
 
-האם חייisAlive()
-מחזיר ערך בוליאני האם הדמות בחיים )כלומר יש לה יותר מאפס נקודות פגיעה( – –
+•	GT, LT comparison (operator>, operatorn<) all comparison operators only valid for iterators of the same type of order and should compair the location of the iterator in the container and not the element inside. Example bellow. Using operators on iterators of differant type or differant containers should throw an examtion. 
+ 
+•	Dereference operator (operator*)
 
-מרחק distance
-מקבל פוינטר לדמות אחרת ומחזיר את המרחק בין הדמויות ) – – double .)
+•	Pre-increment operator (operator++)
 
- פגע hit
-מקבל מספר שלם. מחסיר את כמות נקודות הפגיעה המתאים מהדמות. לא מחזיר דבר. –
+•	begin(type): Returns the appropriate iterator (ascending, cross, or prime) pointing to the first element of the container based on the specified type.
 
-שם getName()
-מחזיר את שם הדמות. -
+•	end(type): Returns the appropriate iterator (ascending, cross, or prime) pointing one position past the last element of the container based on the specified type.
 
-מיקום getLocation()
-מחזיר את מיקום הדמות. -
+For expample: say our container contains the numbers 1,2,4,5,14 the iterators will return the elements in the following order:
 
-הדפסה print()
-מדפיס את שם הדמות, את מספר נקודות הפגיעה שלה, ואת הנקודה בה הדמות נמצאת. אם הדמות מתה מספר - -
-נקודות הפגיעה לא יודפס, ושם הדמות יופיע בסוגריים. לפני השם תופיע אות שמציינת את סוג הדמות: N לנינג'ה ו - C
-לבוקר.
+• Ascending: 1,2,4,5,14   
+operator> should return true on 5>2, 14>1
 
-עבור בוקרים מוגדר גם הפרמטר "כמות כדורים" )מספר שלם( בוקר תמיד נוצר עם שישה כדורים ו 110 נקודות פגיעה. -
-הפונקציות הבאות מוגדרות עבור בוקרים בלבד:
+• prime: 2,5
+operator> should return true on 5>2
+• cross: 1,14,2,5,4  (one from the start then one from the end)
+operator> should return true on 5>14, 2>1, 4>14
 
-לירות shoot 
-מקבל מצביע לאוייב. אם הבוקר לא מת ונשארו לו כדורים, הבוקר יורה באויב, מחסיר מהאויב 10 נקודות פגיעה –
-ומאבד כדור אחד. אחרת, לא ייגרם לאויב כל נזק.
-
-בדיקת מחסנית hasboolets()
-מחזיר – Boolean שמציין האם נשארו כדורים באקדח של הבוקר.
-
-טעינה מחדש reload()
-טוען את האקדח בשישה כדורים חדשים.
-
-עבור נינג'ות מוגדר הפרמטר מהירות )מספר שלם(
-הפונקציות הבאותת מוגדרות עבור נינג'ות בלבד:
-
-תזוזה move 
-מקבלת מצביע לאוייב ומתקדמת לעבר האוייב. הנינג'ה מתקדמת מרחק השווה למהירות שלה. –
-
-שיסוף slash()
-– – מקבלת מצביע לאוייב. אם הנינג'ה בחיים והאוייב במרחק של פחות ממטר אחד הנינג'ה תגרום לאוייב נזק של 40
-נקודות פגיעה. אחרת, לא ייגרם לאוייב כל נזק.
-
-יש שלושה סוגים של נינג'ות:
-
-YoungNinja
-נעות במהירות 14 . נוצרות עם 100 נקודות פגיעה. –
-
-TrainedNinja
-נעות במהירות 12 . נוצרות עם 120 נקודות פגיעה. –
-
-OldNinja
-נעות במהירות 8. נוצרות עם 150 נקודות פגיעה.
-
-# חלק 3 team
-
-מחלקה זו היא קבוצה של עד עשרה לוחמים, כאשר לוחם יכול להיות נינג'ה או בוקר. לכל קבוצה מוגדר מנהיג שהוא אחד
-הלוחמים.
-כאשר קבוצה נוצרת, היא מקבלת מצביע למנהיג.
-פונקציות המוגדרות לגבי קבוצה:
-
-הוספה add() 
-מקבלת מצביע לבוקר או נינג'ה, ומוסיפה אותו לקבוצה. –
-
-תקיפה attack()
-מקבלת מצביע לקבוצה אויבת. תקיפת הקבוצה האויבת תיעשה בצורה הבאה: –
-תחילה יש לבדוק האם מנהיג הקבוצה התוקפת בחיים. אחרת יש לבחור מנהיג חדש, שהוא הדמות החיה הקרובה – –
-ביותר )מבחינת מיקום( למנהיג המת.
-אחר כך הקבוצה תיבחר קורבן מתוך קבוצת האויבים הקורבן הוא חבר קבוצת האויבים החי שעומד קרוב ביותר – – -
-למנהיג הקבוצה התוקפת.
-כל החברים החיים של הקבוצה התוקפת יתקפו את הקורבן הנבחר. בוקרים שיש להם כדורים באקדח יירו בקורבן,
-ובוקרים שאין להם כדורים יטענו את הנשק שלהם. נינג'ות שנמצאות במרחק פחות ממטר אחד מהקורבן ישספו את
-הקורבן, ונינג'ות שנמצאות רחוק יותר יתקדמו לעבר הקורבן. בכל שלב, אם הקורבן מת ייבחר קורבן חדש )שיהיה,
-שוב, דמות האויב החיה הקרובה ביותר למנהיג הקבוצה התוקפת.
-אם אין חברים חיים בקבוצה התוקפת או בקבוצת האויב התקיפה תסתיים. –
-
-האם חיי stillAlive()
-מחזירה מספר שלם כמות חברי הקבוצה שנותרו בחיים. – –
-
-הדפסה print()
-עוברת על כל הדמויות בקבוצה ומדפיסה את פרטיהן. –
-
-דיסטרקטור משחרר את הזכרון שהוקצה לכל הדמויות החברות בקבוצה. –
-
-
-מעבר על כל חברי הקבוצה (לצורך תקיפה, הדפסה, או השוואה) יתבצע תמיד בסדר הבא: קודם כל מעבר על כל הבוקרים,
-ואחר כך מעבר על כל הנינג'ות. בתוך כל קבוצה המעבר יתבצע על פי סדר ההוספה של הדמויות. מטרת הדרישה לפצל בין - -
-בוקרים לנינג'ות בחלק זה היא להקל עליכם. אם אתם מוצאים שהדרישה מסבכת את המימוש חשבו על מימוש אחר. –
-כאשר מחפשים את הדמות הקרובה ביותר, ושתי דמויות נמצאות במרחק זהה, תיבחר הדמות הראשונה שנבדקה ביניהן.
-
-# team2 
-
-זהה לteam אך המעבר על הדמויות יהיה לפי סדר ההוספה ללא אבחנה של בוקרים או נינגות
-
-# SmartTeam
-
-זהה לteam המעבר על הדמויות יהיה לפי בחירתכם לפי איזה סדר שתראו לנכון לממש
-מותר ורצוי בשלב זה "לתשאל" את הקבוצה השניה על מיקומי הכוחות והסטאטוס שלהם כמו גם להתחשב במצב הקבוצה התוקפת כדי למקסם נזק. 
-כאשר מטלה זו תיבדק במעבדה סטודנטים עם אלגוריתם חכם, יצירתי, יעיל ואפקטיבי יזכו בנקודות בונוס 
-(אי אפשר לעבור את ה10 מקסימום ועדין ניתן לקבל 10 עם אלגוריתם פשוט אבל אלגוריתם טוב יכפה על טעויות במקומות אחרים) 
+**All iterators should work in O(1) in both memory and time complexity.**
+Iterators should **NOT** be detached from the main container. If one add's an element to a container after an iterator is created the iterator should know the element return it should its turn will come. 
 
 
 
-**חלק ב**: יש לכתוב: 
+**חלק א**: יש לכתוב: 
 
-*מימוש מלא למטלה כדי שהטסט יעבור.
+* קובץ כותרת הכולל את כל הפונקציות הדרושות (ללא מימוש). שימו לב: הכותרות צריכות להיות נכונות בהתאם למה שנלמד בהרצאות - מומלץ לחזור על החומר לפני שמתחילים לכתוב.
+* בדיקות מקיפות לכל הפונקציות הדרושות.
   
 כיתבו את כל הקבצים הדרושים כך שהפקודות הבאות יעבדו ללא שגיאות:
 
 <div dir='ltr'>
 
-	bash grade
+    make demo && ./demo
+	make test && ./test
 
 </div>
 
