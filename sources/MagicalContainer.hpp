@@ -1,14 +1,13 @@
-#include <iostream>
 #include <vector>
 #include <algorithm> // Added for std::sort
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
 namespace ariel
 {
 }
-#include <iostream>
 
 class MagicalContainer
 {
@@ -86,6 +85,35 @@ public:
         {
         }
 
+        // Move constructor
+        AscendingIterator(AscendingIterator &&other) noexcept
+            : pointer_to_elements(other.pointer_to_elements),
+              pointer_to_size(other.pointer_to_size),
+              index(other.index)
+        {
+            other.pointer_to_elements = nullptr;
+            other.pointer_to_size = nullptr;
+            other.index = 0;
+        }
+
+        // Move assignment operator
+        AscendingIterator &operator=(AscendingIterator &&other) noexcept
+        {
+            if (this != &other)
+            {
+                pointer_to_elements = other.pointer_to_elements;
+                pointer_to_size = other.pointer_to_size;
+                index = other.index;
+
+                other.pointer_to_elements = nullptr;
+                other.pointer_to_size = nullptr;
+                other.index = 0;
+            }
+            return *this;
+        }
+
+        ~AscendingIterator() {}
+
         int &operator*() const
         {
             return (*pointer_to_elements)[index];
@@ -106,7 +134,7 @@ public:
             return *this;
         }
 
-        const AscendingIterator operator++(int)
+        AscendingIterator operator++(int)
         {
             if (index == *pointer_to_size)
             {
@@ -119,12 +147,12 @@ public:
 
         bool operator==(const AscendingIterator &rhs) const
         {
-            return index == rhs.index;
+            return index == rhs.index && *pointer_to_elements == *(rhs.pointer_to_elements);
         }
 
         bool operator!=(const AscendingIterator &rhs) const
         {
-            return index != rhs.index;
+            return !(index == rhs.index);
         }
 
         AscendingIterator &operator=(const AscendingIterator &other)
@@ -135,9 +163,7 @@ public:
                 {
                     throw runtime_error("iterators are pointing at different containers");
                 }
-                pointer_to_elements = other.pointer_to_elements;
-                pointer_to_size = other.pointer_to_size;
-                index = other.index;
+                *this = AscendingIterator{other};
             }
             return *this;
         }
@@ -200,6 +226,39 @@ public:
         {
         }
 
+        // Move constructor
+        SideCrossIterator(SideCrossIterator &&other) noexcept
+            : pointer_to_elements(other.pointer_to_elements),
+              pointer_to_size(other.pointer_to_size),
+              index(other.index),
+              fromBeginning(other.fromBeginning)
+        {
+            other.pointer_to_elements = nullptr;
+            other.pointer_to_size = nullptr;
+            other.index = 0;
+            other.fromBeginning = true;
+        }
+
+        // Move assignment operator
+        SideCrossIterator &operator=(SideCrossIterator &&other) noexcept
+        {
+            if (this != &other)
+            {
+                pointer_to_elements = other.pointer_to_elements;
+                pointer_to_size = other.pointer_to_size;
+                index = other.index;
+                fromBeginning = other.fromBeginning;
+
+                other.pointer_to_elements = nullptr;
+                other.pointer_to_size = nullptr;
+                other.index = 0;
+                other.fromBeginning = true;
+            }
+            return *this;
+        }
+
+        ~SideCrossIterator() {}
+
         int &operator*() const
         {
             return (*pointer_to_elements)[index];
@@ -234,7 +293,7 @@ public:
             return *this;
         }
 
-        const SideCrossIterator operator++(int)
+        SideCrossIterator operator++(int)
         {
             if (index == -1)
             {
@@ -247,7 +306,7 @@ public:
 
         bool operator==(const SideCrossIterator &rhs) const
         {
-            return index == rhs.index;
+            return index == rhs.index && *pointer_to_elements == *(rhs.pointer_to_elements);
         }
 
         bool operator!=(const SideCrossIterator &rhs) const
@@ -264,10 +323,7 @@ public:
                     throw runtime_error("iterators are pointing at different containers");
                 }
 
-                pointer_to_elements = other.pointer_to_elements;
-                pointer_to_size = other.pointer_to_size;
-                index = other.index;
-                fromBeginning = other.fromBeginning;
+                *this = SideCrossIterator{other};
             }
             return *this;
         }
@@ -282,21 +338,18 @@ public:
             if (fromBeginning)
             {
                 if (other.fromBeginning)
+                {
                     return index > other.index;
-                else {
-                    int new_index = *pointer_to_size - other.index;
-                    return index > new_index;
                 }
+                int new_index = *pointer_to_size - other.index;
+                return index > new_index;
             }
-            else
+            if (!other.fromBeginning)
             {
-                if (!other.fromBeginning)
-                    return index < other.index;
-                else {
-                    int new_index = *pointer_to_size - index;
-                    return new_index >= other.index ;
-                }
+                return index < other.index;
             }
+            int new_index = *pointer_to_size - index;
+            return new_index >= other.index;
         }
 
         bool operator<(const SideCrossIterator &other) const
@@ -347,6 +400,35 @@ public:
         {
         }
 
+        // Move constructor
+        PrimeIterator(PrimeIterator &&other) noexcept
+            : pointer_to_elements(other.pointer_to_elements),
+              pointer_to_size(other.pointer_to_size),
+              index(other.index)
+        {
+            other.pointer_to_elements = nullptr;
+            other.pointer_to_size = nullptr;
+            other.index = 0;
+        }
+
+        // Move assignment operator
+        PrimeIterator &operator=(PrimeIterator &&other) noexcept
+        {
+            if (this != &other)
+            {
+                pointer_to_elements = other.pointer_to_elements;
+                pointer_to_size = other.pointer_to_size;
+                index = other.index;
+
+                other.pointer_to_elements = nullptr;
+                other.pointer_to_size = nullptr;
+                other.index = 0;
+            }
+            return *this;
+        }
+
+        ~PrimeIterator() {}
+
         int &operator*() const
         {
             return *((*pointer_to_elements)[index]);
@@ -367,7 +449,7 @@ public:
             return *this;
         }
 
-        const PrimeIterator operator++(int)
+        PrimeIterator operator++(int)
         {
             if (index == *pointer_to_size)
             {
@@ -381,12 +463,12 @@ public:
 
         bool operator==(const PrimeIterator &rhs) const
         {
-            return index == rhs.index;
+            return index == rhs.index && *pointer_to_elements == *(rhs.pointer_to_elements);
         }
 
         bool operator!=(const PrimeIterator &rhs) const
         {
-            return index != rhs.index;
+            return !(index == rhs.index);
         }
 
         PrimeIterator &operator=(const PrimeIterator &other)
@@ -397,9 +479,7 @@ public:
                 {
                     throw runtime_error("iterators are pointing at different containers");
                 }
-                pointer_to_elements = other.pointer_to_elements;
-                pointer_to_size = other.pointer_to_size;
-                index = other.index;
+                *this = PrimeIterator{other};
             }
             return *this;
         }
