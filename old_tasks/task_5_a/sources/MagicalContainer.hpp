@@ -14,7 +14,7 @@ class MagicalContainer
 {
 private:
     int *elements;              // Dynamic array to store the elements
-    int **prime_elements;       // Dynamic array to store the prime indexes
+    int *prime_elements;        // Dynamic array to store the prime indexes
     unsigned int capacity;      // Current capacity of the container
     int currentSize;            // Current number of elements in the container
     unsigned int primeCapacity; // Current capacity of the container
@@ -22,8 +22,7 @@ private:
 
 public:
     MagicalContainer()
-        : elements(nullptr), capacity(0), currentSize(0),
-          prime_elements(nullptr), primeCapacity(0), primeCurrentSize(0) {}
+        : elements(nullptr), capacity(0), currentSize(0) {}
 
     ~MagicalContainer()
     {
@@ -48,7 +47,7 @@ public:
         return &elements;
     }
 
-    int ***getPrimeElements()
+    int **getPrimeElements()
     {
         return &prime_elements;
     }
@@ -56,6 +55,25 @@ public:
     int *getPointerPrimeSize()
     {
         return &primeCurrentSize;
+    }
+
+    bool isPrime(int number)
+    {
+        if (number <= 1)
+        {
+            return false; // 1 and negative numbers are not prime
+        }
+
+        int sqrtNumber = sqrt(number);
+        for (int i = 2; i <= sqrtNumber; i++)
+        {
+            if (number % i == 0)
+            {
+                return false; // Number is divisible by i, hence not prime
+            }
+        }
+
+        return true; // Number is prime
     }
 
     class AscendingIterator
@@ -68,53 +86,46 @@ public:
     public:
         AscendingIterator(MagicalContainer magicalContainer)
             : pointer_to_elements(magicalContainer.getElements()),
-              pointer_to_size(magicalContainer.getPointerSize()), index(0)
+              pointer_to_size(magicalContainer.getPointerSize()), index(-1)
         {
         }
 
         AscendingIterator(const AscendingIterator &other, int index)
             : pointer_to_elements(other.pointer_to_elements),
-              pointer_to_size(other.pointer_to_size),
               index(index)
         {
         }
 
         AscendingIterator(const AscendingIterator &other)
             : pointer_to_elements(other.pointer_to_elements),
-              pointer_to_size(other.pointer_to_size),
               index(other.index)
         {
         }
 
         int &operator*() const
         {
-            return (*pointer_to_elements)[index];
+            return *pointer_to_size;
+            // return (*pointer_to_elements)[index];
         }
 
         int *operator->() const
         {
-            return &(*pointer_to_elements)[index];
+            return pointer_to_size;
+            // return &(*pointer_to_elements)[index];
         }
 
         AscendingIterator &operator++()
         {
-            if (index == *pointer_to_size)
-            {
-                throw runtime_error("Iterator Increment Beyond End");
-            }
-            ++index;
+            // ++index;
             return *this;
         }
 
         const AscendingIterator operator++(int)
         {
-            if (index == *pointer_to_size)
-            {
-                throw runtime_error("Iterator Increment Beyond End");
-            }
-            AscendingIterator tmp = *this;
-            ++index;
-            return tmp;
+            // AscendingIterator tmp = *this;
+            // ++index;
+            // return tmp;
+            return *this;
         }
 
         bool operator==(const AscendingIterator &rhs) const
@@ -129,16 +140,12 @@ public:
 
         AscendingIterator &operator=(const AscendingIterator &other)
         {
-            if (this != &other)
-            {
-                if (this->pointer_to_elements != other.pointer_to_elements)
-                {
-                    throw runtime_error("iterators are pointing at different containers");
-                }
-                pointer_to_elements = other.pointer_to_elements;
-                pointer_to_size = other.pointer_to_size;
-                index = other.index;
-            }
+            // if (this != &other)
+            // {
+            //     pointer_to_elements = other.pointer_to_elements;
+            //     pointer_to_size = other.pointer_to_size;
+            //     index = other.index;
+            // }
             return *this;
         }
 
@@ -159,11 +166,8 @@ public:
 
         AscendingIterator end()
         {
-            if (*pointer_to_size == 0)
-            {
-                return AscendingIterator(*this, 0);
-            }
-            return AscendingIterator{*this, *pointer_to_size};
+            return AscendingIterator{*this, 0};
+            // return AscendingIterator{*this, *pointer_to_size};
         }
     };
 
@@ -179,7 +183,7 @@ public:
         SideCrossIterator(MagicalContainer magicalContainer)
             : pointer_to_elements(magicalContainer.getElements()),
               pointer_to_size(magicalContainer.getPointerSize()),
-              index(0),
+              index(-1),
               fromBeginning(true)
         {
         }
@@ -192,62 +196,57 @@ public:
         {
         }
 
-        SideCrossIterator(const SideCrossIterator &other, int index, bool fromBeginning)
+        SideCrossIterator(const SideCrossIterator &other, int index)
             : pointer_to_elements(other.pointer_to_elements),
               pointer_to_size(other.pointer_to_size),
               index(index),
-              fromBeginning(fromBeginning)
+              fromBeginning(other.fromBeginning)
         {
         }
 
         int &operator*() const
         {
-            return (*pointer_to_elements)[index];
+            return *pointer_to_size;
+            // return (*pointer_to_elements)[index];
         }
 
         int *operator->() const
         {
-            return &(*pointer_to_elements)[index];
+            return nullptr;
+            // return &(*pointer_to_elements)[index];
         }
 
         SideCrossIterator &operator++()
         {
-            if (index == -1)
-            {
-                throw runtime_error("Iterator Increment Beyond End");
-            }
-            if ((int)((*pointer_to_size) / 2) == index)
-            {
-                index = -1;
-                return *this;
-            }
-            if (fromBeginning)
-            {
-                index = *pointer_to_size - index - 1;
-                fromBeginning = false;
-            }
-            else
-            {
-                index = *pointer_to_size - index;
-                fromBeginning = true;
-            }
+            // if ((int)((*pointer_to_size) / 2) == index)
+            // {
+            //     index = -1;
+            //     return *this;
+            // }
+            // if (fromBeginning)
+            // {
+            //     index = *pointer_to_size - index - 1;
+            //     fromBeginning = false;
+            // }
+            // else
+            // {
+            //     index = *pointer_to_size - index;
+            //     fromBeginning = true;
+            // }
             return *this;
         }
 
         const SideCrossIterator operator++(int)
         {
-            if (index == -1)
-            {
-                throw runtime_error("Iterator Increment Beyond End");
-            }
-            SideCrossIterator tmp = *this;
-            ++(*this);
-            return tmp;
+            // SideCrossIterator tmp = *this;
+            // ++(*this);
+            // return tmp;
+            return *this;
         }
 
         bool operator==(const SideCrossIterator &rhs) const
         {
-            return index == rhs.index;
+            return index == rhs.index && fromBeginning == rhs.fromBeginning;
         }
 
         bool operator!=(const SideCrossIterator &rhs) const
@@ -257,79 +256,49 @@ public:
 
         SideCrossIterator &operator=(const SideCrossIterator &other)
         {
-            if (this != &other)
-            {
-                if (this->pointer_to_elements != other.pointer_to_elements)
-                {
-                    throw runtime_error("iterators are pointing at different containers");
-                }
-
-                pointer_to_elements = other.pointer_to_elements;
-                pointer_to_size = other.pointer_to_size;
-                index = other.index;
-                fromBeginning = other.fromBeginning;
-            }
+            // if (this != &other)
+            // {
+            //     pointer_to_elements = other.pointer_to_elements;
+            //     pointer_to_size = other.pointer_to_size;
+            //     index = other.index;
+            //     fromBeginning = other.fromBeginning;
+            // }
             return *this;
         }
 
         bool operator>(const SideCrossIterator &other) const
         {
-            if (index == -1 || other.index == -1)
-            {
-                throw runtime_error("Comparing with end iterator");
-            }
-
-            if (fromBeginning)
-            {
-                if (other.fromBeginning)
-                    return index > other.index;
-                else {
-                    int new_index = *pointer_to_size - other.index;
-                    return index > new_index;
-                }
-            }
-            else
-            {
-                if (!other.fromBeginning)
-                    return index < other.index;
-                else {
-                    int new_index = *pointer_to_size - index;
-                    return new_index >= other.index ;
-                }
-            }
+            return index > other.index;
         }
 
         bool operator<(const SideCrossIterator &other) const
         {
-            return !(*this > other || *this == other);
+            return index < other.index;
         }
 
         SideCrossIterator begin()
         {
-            return SideCrossIterator(*this, 0, true);
+            return SideCrossIterator(*this, 0);
         }
 
         SideCrossIterator end()
         {
-            if (*pointer_to_size == 0)
-            {
-                return SideCrossIterator(*this, 0, true);
-            }
-            return SideCrossIterator(*this, -1, true);
+            return SideCrossIterator(*this, 0);
+            // return SideCrossIterator(*this, -1);
         }
     };
 
     class PrimeIterator
     {
     private:
-        int ***pointer_to_elements;
+        int **pointer_to_elements;
         int *pointer_to_size;
         int index;
 
     public:
         PrimeIterator(MagicalContainer magicalContainer)
             : pointer_to_elements(magicalContainer.getPrimeElements()),
-              pointer_to_size(magicalContainer.getPointerPrimeSize()), index(0)
+              pointer_to_size(magicalContainer.getPointerPrimeSize()), index(-1)
         {
         }
 
@@ -349,33 +318,27 @@ public:
 
         int &operator*() const
         {
-            return *((*pointer_to_elements)[index]);
+            return *pointer_to_size;
+            // return (*pointer_to_elements)[index];
         }
 
         int *operator->() const
         {
-            return ((*pointer_to_elements)[index]);
+            return pointer_to_size;
+            // return &(*pointer_to_elements)[index];
         }
 
         PrimeIterator &operator++()
         {
-            if (index == *pointer_to_size)
-            {
-                throw runtime_error("Iterator Increment Beyond End");
-            }
-            ++index;
+            // ++index;
             return *this;
         }
 
         const PrimeIterator operator++(int)
         {
-            if (index == *pointer_to_size)
-            {
-                throw runtime_error("Iterator Increment Beyond End");
-            }
-            PrimeIterator tmp = *this;
-            ++index;
-            return tmp;
+            // PrimeIterator tmp = *this;
+            // ++index;
+            // return tmp;
             return *this;
         }
 
@@ -391,16 +354,12 @@ public:
 
         PrimeIterator &operator=(const PrimeIterator &other)
         {
-            if (this != &other)
-            {
-                if (this->pointer_to_elements != other.pointer_to_elements)
-                {
-                    throw runtime_error("iterators are pointing at different containers");
-                }
-                pointer_to_elements = other.pointer_to_elements;
-                pointer_to_size = other.pointer_to_size;
-                index = other.index;
-            }
+            // if (this != &other)
+            // {
+            //     pointer_to_elements = other.pointer_to_elements;
+            //     pointer_to_size = other.pointer_to_size;
+            //     index = other.index;
+            // }
             return *this;
         }
 
@@ -421,11 +380,8 @@ public:
 
         PrimeIterator end()
         {
-            if (*pointer_to_size == 0)
-            {
-                return PrimeIterator(*this, 0);
-            }
-            return PrimeIterator{*this, *pointer_to_size};
+            return PrimeIterator{*this, 0};
+            // return PrimeIterator{*this, *pointer_to_size};
         }
     };
 };
